@@ -23,14 +23,8 @@ conflicts at a glance.
 
 - **Frontend**:
 
-  - React for component-based UI development
-  - Tailwind CSS for styling (focused on simplicity and functionality)
-  - TypeScript for type safety
-  - React DnD (or similar library) for drag-and-drop functionality
-
-- **State Management**:
-  - React Context API or Redux for global state management
-  - React hooks for component-level state
+  - Nuxt
+  - Tailwind CSS
 
 ## Core Features
 

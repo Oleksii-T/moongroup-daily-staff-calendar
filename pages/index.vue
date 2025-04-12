@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 // Temporary mock data for development
 const staffMembers = ref([
   {
@@ -57,7 +57,7 @@ const staffMembers = ref([
   }
 ])
 
-const handleAppointmentCreated = (appointment: Appointment & { staffEmail: string }) => {
+const handleAppointmentCreated = (appointment) => {
   staffMembers.value = staffMembers.value.map(staff => {
     if (staff.email === appointment.staffEmail) {
       return {

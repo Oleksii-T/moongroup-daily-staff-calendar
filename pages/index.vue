@@ -4,6 +4,7 @@
     <StaffCalendar 
       :staff-members="staffMembers" 
       @appointment-created="handleAppointmentCreated"
+      @appointment-moved="handleAppointmentMoved"
     />
   </div>
 </template>
@@ -81,6 +82,37 @@ const handleAppointmentCreated = (appointment) => {
       return {
         ...staff,
         appointments: [...staff.appointments, appointment]
+      }
+    }
+    return staff
+  })
+}
+
+const handleAppointmentMoved = ({ appointment, newStartTime, newEndTime, newStaffEmail }) => {
+  // First, remove the appointment from its original staff member
+  staffMembers.value = staffMembers.value.map(staff => {
+    if (staff.appointments.some(apt => apt.id === appointment.id)) {
+      return {
+        ...staff,
+        appointments: staff.appointments.filter(apt => apt.id !== appointment.id)
+      }
+    }
+    return staff
+  })
+
+  // Then, add it to the new staff member with updated times
+  staffMembers.value = staffMembers.value.map(staff => {
+    if (staff.email === newStaffEmail) {
+      return {
+        ...staff,
+        appointments: [
+          ...staff.appointments,
+          {
+            ...appointment,
+            from: newStartTime,
+            to: newEndTime
+          }
+        ]
       }
     }
     return staff

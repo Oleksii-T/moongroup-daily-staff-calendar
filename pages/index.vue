@@ -15,7 +15,16 @@ const staffMembers = ref([
     name: 'John Doe',
     email: 'john@example.com',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    availabilities: [],
+    availabilities: [
+      {
+        from: '08:30',
+        to: '13:00'
+      },
+      {
+        from: '14:00',
+        to: '18:30'
+      }
+    ],
     appointments: [
       {
         id: '1',
@@ -37,7 +46,16 @@ const staffMembers = ref([
     name: 'Jane Smith',
     email: 'jane@example.com',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-    availabilities: [],
+    availabilities: [
+      {
+        from: '08:30',
+        to: '12:30'
+      },
+      {
+        from: '13:30',
+        to: '18:00'
+      }
+    ],
     appointments: [
       {
         id: '3',

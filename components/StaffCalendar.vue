@@ -37,21 +37,23 @@
       <div 
         v-for="staff in staffMembers" 
         :key="`${time}-${staff.email}`"
-        :class="`w-[200px] relative group border-t ${isPeriodOf(time, 15) || isPeriodOf(time, 45) ? 'border-gray-100' : ''}`"
-        @click="handleSlotClick(time, staff)"
+        :class="[
+          'w-[200px] relative group border-t',
+          isPeriodOf(time, '00') || isPeriodOf(time, 30) ? 'border-gray-200' : '',
+          isPeriodOf(time, '15') || isPeriodOf(time, 45) ? 'border-gray-100' : '',
+          isTimeAvailable(staff, time) ? 'hover:bg-gray-50' : 'bg-gray-50 cursor-not-allowed'
+        ]"
+        @click="isTimeAvailable(staff, time) && handleSlotClick(time, staff)"
       >
-        <!-- Add hover effect element -->
-        <div class="absolute inset-0 bg-gray-100 opacity-0 group-hover:opacity-50 transition-opacity"></div>
-        
         <!-- Only render appointments at their start time -->
         <template v-for="(appointment, index) in getAppointmentsAtTime(staff, time)" :key="appointment.id">
-            <CalendarAppointment
-              :appointment="appointment"
-              :index="index"
-              :total-overlapping="getOverlappingAppointmentsCount(staff, appointment)"
-              :current-staff="staff"
-              @click="handleAppointmentClick"
-            />
+          <CalendarAppointment
+            :appointment="appointment"
+            :index="index"
+            :total-overlapping="getOverlappingAppointmentsCount(staff, appointment)"
+            :current-staff="staff"
+            @click="handleAppointmentClick"
+          />
         </template>
       </div>
     </div>
@@ -86,8 +88,27 @@ const isPeriodOf = (time, minutes) => {
   return time.endsWith(`:${minutes}`)
 }
 
+const getHourFromTime = (time) => {
+  return time.split(':')[0]
+}
+
+const timeToMinutes = (time) => {
+  const [hours, minutes] = time.split(':').map(Number)
+  return hours * 60 + minutes
+}
+
+const isTimeAvailable = (staff, time) => {
+  const currentTime = timeToMinutes(time)
+  
+  // Check if time falls within any availability period
+  return staff.availabilities.some(availability => {
+    const startTime = timeToMinutes(availability.from)
+    const endTime = timeToMinutes(availability.to)
+    return currentTime >= startTime && currentTime < endTime
+  })
+}
+
 const handleSlotClick = (time, staff) => {
-  // Create a 1-hour appointment
   const startTime = time
   const endTime = addHour(time)
   
@@ -101,19 +122,16 @@ const handleSlotClick = (time, staff) => {
   })
 }
 
-// Helper function to add 1 hour to a time string
-const getHourFromTime = (time) => {
-  return time.split(':')[0];
-}
-
-// Helper function to add 1 hour to a time string
 const addHour = (time) => {
   const [hours, minutes] = time.split(':').map(Number)
   const newHours = hours + 1
   return `${newHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 }
 
-// Add this new function to find overlapping appointments
+const getAppointmentsAtTime = (staff, time) => {
+  return staff.appointments.filter(apt => apt.from === time)
+}
+
 const getOverlappingAppointments = (staff, appointment) => {
   const appointmentStart = timeToMinutes(appointment.from)
   const appointmentEnd = timeToMinutes(appointment.to)
@@ -121,29 +139,15 @@ const getOverlappingAppointments = (staff, appointment) => {
   return staff.appointments.filter(apt => {
     const start = timeToMinutes(apt.from)
     const end = timeToMinutes(apt.to)
-    
-    // Check if appointments overlap
     return (start < appointmentEnd && end > appointmentStart)
   })
 }
 
 const getOverlappingAppointmentsCount = (staff, appointment) => {
-  return getOverlappingAppointments(staff, appointment).length;
-}
-
-// Keep getAppointmentsAtTime simple - only return appointments that start at this time
-const getAppointmentsAtTime = (staff, time) => {
-  return staff.appointments.filter(apt => apt.from === time)
-}
-
-// Convert time string to minutes since start of day
-const timeToMinutes = (time) => {
-  const [hours, minutes] = time.split(':').map(Number)
-  return hours * 60 + minutes
+  return getOverlappingAppointments(staff, appointment).length
 }
 
 const handleAppointmentClick = (appointment) => {
   console.log('Appointment clicked:', appointment)
 }
-
 </script>
